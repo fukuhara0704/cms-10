@@ -1,0 +1,27 @@
+version: "3"
+services:
+  db:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - ./mysql:/var/lib/mysql
+      - ./sql:/docker-entrypoint-initdb.d
+    user: "1000:50"
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    #command: --innodb-use-native-aio=0
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./code:/code
+    tty: true
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
